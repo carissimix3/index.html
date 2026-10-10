@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101014">
+<title>Nocturne — AI Stories</title>
+<style>
+:root{--bg:#101014;--panel:#19191f;--panel2:#22222b;--line:#30303b;--text:#f5f3f8;--muted:#aaa6b4;--accent:#c6a7ff;--accent2:#8d6bce;--bubble:#292733}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100dvh}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:760px;margin:auto;min-height:100dvh;display:flex;flex-direction:column;background:radial-gradient(ellipse at 70% -10%,#302344 0,transparent 38%),var(--bg)}
+.top{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#101014eF;backdrop-filter:blur(16px);z-index:3}
+.brand{font-size:19px;font-weight:750;letter-spacing:.4px}.brand span{color:var(--accent)}.subbrand{font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase}
+.pill{border:1px solid #4b3b60;background:#251e30;color:#ddcbff;border-radius:999px;padding:7px 10px;font-size:11px}
+.view{display:none;flex:1;min-height:0}.view.active{display:flex;flex-direction:column}
+.home{padding:22px 18px 32px}.eyebrow{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:2px;font-weight:700}.hero{font-size:31px;line-height:1.1;font-weight:760;margin:9px 0 10px;letter-spacing:-.8px}.desc{color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 24px}
+.sectionhead{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px;font-weight:700}.sectionhead small{font-weight:400;color:var(--muted)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.character{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:linear-gradient(145deg,#25212e,#18181e);padding:0;text-align:left;color:var(--text);min-width:0}
+.portrait{height:132px;display:flex;align-items:end;padding:13px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 28%,#75558e 0,#35253f 37%,#1a1920 75%)}
+.portrait:before{content:"";position:absolute;width:92px;height:110px;border-radius:48% 48% 35% 35%;left:calc(50% - 46px);top:25px;background:linear-gradient(130deg,#d2b4aa,#73596c 70%);filter:drop-shadow(0 8px 18px #0008)}
+.portrait:after{content:"";position:absolute;width:110px;height:85px;border-radius:55% 55% 20% 20%;left:calc(50% - 55px);top:8px;background:linear-gradient(135deg,#17141f,#413047);clip-path:polygon(10% 0,90% 0,100% 65%,78% 45%,72% 100%,55% 53%,25% 90%,22% 38%,0 70%)}
+.portrait.mira{background:radial-gradient(circle at 50% 25%,#7b586e,#36232e 48%,#19171c)}.portrait.mira:before{background:linear-gradient(130deg,#edc5b4,#9c6b75)}.portrait.mira:after{background:linear-gradient(135deg,#171018,#6a3c52)}
+.portrait.noah{background:radial-gradient(circle at 50% 25%,#42617a,#1d2d3d 50%,#17191f)}.portrait.noah:before{background:linear-gradient(130deg,#c9a18c,#6e5053)}.portrait.noah:after{background:linear-gradient(135deg,#11131a,#514653);clip-path:polygon(5% 0,95% 0,90% 45%,70% 28%,60% 55%,35% 42%,20% 70%,0 40%)}
+.portrait.luca{background:radial-gradient(circle at 50% 25%,#82734f,#393020 50%,#19191b)}.portrait.luca:before{background:linear-gradient(130deg,#e0bba0,#87605a)}.portrait.luca:after{background:linear-gradient(135deg,#201b14,#8c7655);clip-path:polygon(0 0,100% 0,92% 65%,76% 30%,65% 53%,35% 50%,20% 70%,8% 40%)}
+.portrait.eli{background:radial-gradient(circle at 50% 25%,#4c6d63,#1e302b 50%,#171a19)}.portrait.eli:before{background:linear-gradient(130deg,#e5c3a6,#9a7865)}.portrait.eli:after{background:linear-gradient(135deg,#151b18,#4d6655)}
+.tag{position:relative;z-index:1;background:#111016b8;border:1px solid #ffffff24;border-radius:999px;padding:5px 8px;font-size:10px;color:#f1e8ff}
+.cardbody{padding:12px 13px 14px}.name{font-weight:750;font-size:16px}.role{font-size:11px;color:var(--accent);margin-top:4px}.blurb{font-size:12px;color:var(--muted);line-height:1.4;margin-top:8px;min-height:34px}
+.note{margin-top:18px;border:1px solid var(--line);background:#17171d;border-radius:14px;padding:12px;color:var(--muted);font-size:12px;line-height:1.5}.note b{color:#e8dcff}
+.chathead{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}.avatar{width:42px;height:42px;flex:0 0 42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(140deg,#73578a,#2a2137);font-size:21px}.avatar.noah{background:linear-gradient(140deg,#537c98,#222b40)}.avatar.luca{background:linear-gradient(140deg,#8c754d,#342a1e)}.avatar.eli{background:linear-gradient(140deg,#628a78,#23392f)}.chatname{font-weight:750}.status{font-size:11px;color:#a9d9b6;margin-top:3px}.back{border:1px solid var(--line);background:var(--panel);color:var(--text);width:35px;height:35px;border-radius:12px;font-size:19px}
+.messages{padding:18px 14px;display:flex;flex-direction:column;gap:12px;flex:1;overflow:auto;min-height:240px}.storyline{font-size:11px;color:var(--muted);text-align:center;line-height:1.5;margin:2px auto 8px;max-width:90%}.msg{max-width:86%;padding:12px 14px;border-radius:17px;font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}.msg.ai{align-self:flex-start;background:var(--bubble);border:1px solid #383442;border-bottom-left-radius:5px}.msg.user{align-self:flex-end;background:linear-gradient(135deg,#654a87,#4b3866);border-bottom-right-radius:5px}.msg .sender{font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:#c8b4e5;margin-bottom:5px}.msg.user .sender{color:#e5d9ff}.composer{padding:12px 12px calc(env(safe-area-inset-bottom) + 12px);border-top:1px solid var(--line);background:#121217}.composerhint{font-size:10px;color:var(--muted);margin:0 4px 8px}.compose-row{display:flex;align-items:end;gap:8px}.compose-row textarea{resize:none;max-height:120px;min-height:44px;flex:1;border:1px solid #393541;border-radius:15px;background:#222129;color:var(--text);padding:12px;outline:none}.compose-row textarea:focus{border-color:#8668b2}.send{height:44px;width:46px;border:0;border-radius:14px;background:var(--accent);color:#21182c;font-size:20px;font-weight:800}.send:disabled{opacity:.45}.bottomnav{display:flex;justify-content:space-around;border-top:1px solid var(--line);padding:10px 0 calc(env(safe-area-inset-bottom) + 7px);background:#111116}.navbtn{background:none;border:0;color:var(--muted);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 20px}.navbtn span{font-size:19px}.navbtn.active{color:var(--accent)}
+.settings{padding:22px 18px}.settingrow{padding:16px 0;border-bottom:1px solid var(--line)}.settingrow strong{display:block;font-size:14px}.settingrow p{font-size:12px;line-height:1.5;color:var(--muted);margin:6px 0 0}.settingrow button{margin-top:10px;background:var(--panel2);color:var(--text);border:1px solid var(--line);padding:9px 12px;border-radius:10px}.empty{color:var(--muted);font-size:13px}
+@media(min-width:600px){.home{padding:28px}.portrait{height:170px}.cards{grid-template-columns:repeat(4,1fr)}.messages{padding:24px 26px}.msg{max-width:75%}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div><div class="brand">NOCTURNE<span>✦</span></div><div class="subbrand">AI stories, your rules</div></div><div class="pill">✦ Bez gemsów</div></header>
+<section id="home" class="view active">
+<div class="home"><div class="eyebrow">Twoje historie zaczynają się tutaj</div><div class="hero">Kto dziś skradnie<br>Twoją uwagę?</div><p class="desc">Wybierz postać, wejdź w historię i zobacz, dokąd zaprowadzi Was rozmowa.</p>
+<div class="sectionhead">Poznaj postacie <small>4 historie</small></div>
+<div class="cards">
+<button class="character" onclick="openChat('mira')"><div class="portrait mira"><span class="tag">slow burn · romans</span></div><div class="cardbody"><div class="name">Mira Vale</div><div class="role">Dziewczyna z sąsiedztwa</div><div class="blurb">Pyskata, bystra i trudniejsza do rozszyfrowania, niż się wydaje.</div></div></button>
+<button class="character" onclick="openChat('noah')"><div class="portrait noah"><span class="tag">tension · tajemnica</span></div><div class="cardbody"><div class="name">Noah Reed</div><div class="role">Nieznajomy z baru</div><div class="blurb">Mało mówi. Zauważa zdecydowanie za dużo.</div></div></button>
+<button class="character" onclick="openChat('luca')"><div class="portrait luca"><span class="tag">rivals · chemia</span></div><div class="cardbody"><div class="name">Luca Moretti</div><div class="role">Twój największy rywal</div><div class="blurb">Pewny siebie, sarkastyczny i irytująco czarujący.</div></div></button>
+<button class="character" onclick="openChat('eli')"><div class="portrait eli"><span class="tag">comfort · slow burn</span></div><div class="cardbody"><div class="name">Eli Morgan</div><div class="role">Przyjaciel z przeszłości</div><div class="blurb">Pamięta rzeczy, o których Ty dawno zapomniałaś.</div></div></button>
+</div>
+<div class="note"><b>Wersja prototypowa</b><br>Interfejs działa offline i nie ma płatności ani gemsów. Na razie odpowiedzi są przykładowe, nie generowane przez prawdziwy model AI. Twoje rozmowy zapisują się na tym urządzeniu.</div>
+</div></section>
+<section id="chat" class="view">
+<div class="chathead"><button class="back" onclick="showView('home')" aria-label="Wróć">‹</button><div id="avatar" class="avatar">✦</div><div style="flex:1"><div id="chatname" class="chatname">Postać</div><div class="status">● Historia aktywna</div></div><button class="back" onclick="clearChat()" aria-label="Wyczyść rozmowę">↺</button></div>
+<div id="messages" class="messages"></div>
+<div class="composer"><div class="composerhint">Napisz tak, jak czujesz. Możesz też opisać swoje gesty w *gwiazdkach*.</div><div class="compose-row"><textarea id="entry" rows="1" placeholder="Napisz wiadomość..." aria-label="Wiadomość"></textarea><button id="send" class="send" onclick="sendMessage()" aria-label="Wyślij">↑</button></div></div>
+</section>
+<section id="settings" class="view"><div class="settings"><div class="eyebrow">Twoja przestrzeń</div><div class="hero" style="font-size:27px">Ustawienia</div><div class="settingrow"><strong>Twoje rozmowy</strong><p>Wiadomości są zapisywane lokalnie w przeglądarce na tym urządzeniu.</p><button onclick="exportChats()">Eksportuj rozmowy (.json)</button></div><div class="settingrow"><strong>Prywatność</strong><p>Ten prototyp nie wysyła wiadomości na serwer. Nie zawiera analityki, reklam ani zakupów.</p></div><div class="settingrow"><strong>Co dalej?</strong><p>Możemy dodać prawdziwy model AI, tworzenie własnych postaci, edycję ich osobowości i synchronizację. Dla rozmów bez opłat potrzebny będzie lokalny model na urządzeniu albo usługa z darmowym limitem.</p></div><div class="settingrow"><button onclick="resetAll()">Usuń wszystkie zapisane rozmowy</button></div></div></section>
+<nav class="bottomnav"><button class="navbtn active" data-view="home" onclick="showView('home')"><span>⌂</span>Odkrywaj</button><button class="navbtn" data-view="settings" onclick="showView('settings')"><span>☾</span>Ustawienia</button></nav>
+</div>
+<script>
+const chars={
+mira:{name:'Mira Vale',role:'Dziewczyna z sąsiedztwa',avatar:'M',intro:'*Mira opiera się o framugę drzwi, z rozbawionym uśmiechem obserwując Cię przez chwilę.*\\n\\n„No proszę. Myślałam, że już nie przyjdziesz. Mam rozumieć, że jednak trochę za mną tęskniłaś?”',responses:[
+' *Mira unosi brew, ale kącik jej ust zdradza rozbawienie.* „To miało mnie przekonać? Spróbuj jeszcze raz. Tym razem szczerze.”',
+'*Przez moment jej uśmiech łagodnieje.* „Wiesz, że przy Tobie trudno mi udawać, że nic mnie nie obchodzi, prawda?”',
+'*Mira odwraca wzrok, jakby nagle zainteresowała ją ściana.* „Nie przyzwyczajaj się. Po prostu… dobrze, że jesteś.”',
+'„Okej, tego się nie spodziewałam.” *Przygląda Ci się uważniej.* „Mów dalej. Słucham.”'
+]},
+noah:{name:'Noah Reed',role:'Nieznajomy z baru',avatar:'N',intro:'*W półmroku baru Noah odsuwa szklankę i patrzy na Ciebie z cichą ciekawością.*\\n\\n„Zastanawiałem się, czy podejdziesz. Usiądziesz, czy mam dalej udawać, że wcale nie czekam?”',responses:[
+'*Noah przez chwilę obraca szklankę w dłoni.* „Nie wyglądasz na osobę, która robi coś bez powodu. Jaki jest Twój?”',
+'„Może nie mówię dużo.” *Jego spojrzenie zatrzymuje się na Tobie.* „Ale kiedy już słucham, to naprawdę.”',
+'*Na jego twarzy pojawia się ledwie zauważalny uśmiech.* „To interesujące. Zwykle ludzie nie mówią mi tego tak prosto w twarz.”',
+'„Dobrze.” *Przysuwa krzesło odrobinę bliżej.* „To teraz moja kolej na pytanie.”'
+]},
+luca:{name:'Luca Moretti',role:'Twój największy rywal',avatar:'L',intro:'*Luca rzuca Ci spojrzenie znad kubka kawy. Wygląda, jakby od dziesięciu minut czekał tylko po to, żeby mieć ostatnie słowo.*\\n\\n„Spóźnienie. Odważny sposób na rozpoczęcie kolejnej porażki.”',responses:[
+'*Luca śmieje się krótko pod nosem.* „Masz szczęście, że jesteś zabawna. Czasami.”',
+'„Nie myl pewności siebie z arogancją.” *Nachyla się nieco bliżej.* „Chociaż przyznaję, że przy Tobie to cienka granica.”',
+'*Na moment traci swój zadziorny uśmiech.* „Nie powiedziałem, że nie lubię z Tobą rywalizować. Powiedziałem, że nie znoszę przegrywać.”',
+'„Och, czyli jednak potrafisz mnie zaskoczyć.” *Wskazuje na wolne miejsce obok siebie.* „Siadaj. Nie każ mi prosić drugi raz.”'
+]},
+eli:{name:'Eli Morgan',role:'Przyjaciel z przeszłości',avatar:'E',intro:'*Eli podnosi wzrok, gdy Cię zauważa. Przez sekundę wygląda na zaskoczonego, a potem uśmiecha się w ten znajomy, spokojny sposób.*\\n\\n„Hej. Minęło trochę czasu. Nie byłem pewien, czy jeszcze będziesz chciała ze mną rozmawiać.”',responses:[
+'*Eli kiwa głową, dając Ci czas.* „Nie musisz od razu wszystkiego tłumaczyć. Jestem tutaj.”',
+'„Pamiętam.” *Uśmiecha się lekko.* „Zawsze tak robisz, kiedy próbujesz ukryć, że coś Cię ruszyło.”',
+'*Jego głos staje się cichszy.* „Tęskniłem za tym. Za tym, że mogę po prostu z Tobą pogadać.”',
+'„Może nie wszystko da się naprawić od razu.” *Patrzy na Ciebie łagodnie.* „Ale możemy spróbować, jeśli chcesz.”'
+]}
+};
+let current=null, chats=JSON.parse(localStorage.getItem('nocturne_chats')||'{}'), turns={};
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(id==='chat')document.querySelector('.bottomnav').style.display='none';else document.querySelector('.bottomnav').style.display='flex'}
+function save(){localStorage.setItem('nocturne_chats',JSON.stringify(chats))}
+function openChat(id){current=id;let c=chars[id];document.getElementById('chatname').textContent=c.name;let av=document.getElementById('avatar');av.textContent=c.avatar;av.className='avatar '+id; if(!chats[id]||!chats[id].length)chats[id]=[{who:'ai',text:c.intro}];renderMessages();showView('chat');document.getElementById('entry').focus()}
+function renderMessages(){let box=document.getElementById('messages');box.innerHTML='';(chats[current]||[]).forEach(m=>{let d=document.createElement('div');d.className='msg '+(m.who==='user'?'user':'ai');let sender=document.createElement('div');sender.className='sender';sender.textContent=m.who==='user'?'Ty':chars[current].name;let body=document.createElement('div');body.textContent=m.text;d.append(sender,body);box.appendChild(d)});box.scrollTop=box.scrollHeight}
+function sendMessage(){let input=document.getElementById('entry'),text=input.value.trim();if(!text||!current)return;chats[current].push({who:'user',text});input.value='';save();renderMessages();let send=document.getElementById('send');send.disabled=true;setTimeout(()=>{let c=chars[current];let idx=(turns[current]||0)%c.responses.length;let answer=c.responses[idx];turns[current]=(turns[current]||0)+1;chats[current].push({who:'ai',text:answer});save();renderMessages();send.disabled=false;input.focus()},450)}
+document.getElementById('entry').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+function clearChat(){if(!current)return;if(confirm('Wyczyścić tę rozmowę i zacząć od początku?')){chats[current]=[{who:'ai',text:chars[current].intro}];save();renderMessages()}}
+function resetAll(){if(confirm('Usunąć wszystkie zapisane rozmowy z tego urządzenia?')){chats={};save();alert('Rozmowy usunięte.')}} 
+function exportChats(){let blob=new Blob([JSON.stringify(chats,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nocturne-rozmowy.json';a.click();URL.revokeObjectURL(a.href)}
+</script>
+</body>
+</html>
