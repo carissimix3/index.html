@@ -88,8 +88,52 @@ function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.
 function save(){localStorage.setItem('nocturne_chats',JSON.stringify(chats))}
 function openChat(id){current=id;let c=chars[id];document.getElementById('chatname').textContent=c.name;let av=document.getElementById('avatar');av.textContent=c.avatar;av.className='avatar '+id; if(!chats[id]||!chats[id].length)chats[id]=[{who:'ai',text:c.intro}];renderMessages();showView('chat');document.getElementById('entry').focus()}
 function renderMessages(){let box=document.getElementById('messages');box.innerHTML='';(chats[current]||[]).forEach(m=>{let d=document.createElement('div');d.className='msg '+(m.who==='user'?'user':'ai');let sender=document.createElement('div');sender.className='sender';sender.textContent=m.who==='user'?'Ty':chars[current].name;let body=document.createElement('div');body.textContent=m.text;d.append(sender,body);box.appendChild(d)});box.scrollTop=box.scrollHeight}
-function sendMessage(){let input=document.getElementById('entry'),text=input.value.trim();if(!text||!current)return;chats[current].push({who:'user',text});input.value='';save();renderMessages();let send=document.getElementById('send');send.disabled=true;setTimeout(()=>{let c=chars[current];let idx=(turns[current]||0)%c.responses.length;let answer=c.responses[idx];turns[current]=(turns[current]||0)+1;chats[current].push({who:'ai',text:answer});save();renderMessages();send.disabled=false;input.focus()},450)}
-document.getElementById('entry').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+
+async function sendMessage(){
+  let input=document.getElementById('entry');
+  let text=input.value.trim();
+  if(!text||!current)return;
+
+  let chatId=current;
+  let c=chars[chatId];
+
+  chats[chatId].push({who:'user',text});
+  input.value='';
+  save();
+  renderMessages();
+
+  let send=document.getElementById('send');
+  send.disabled=true;
+
+  try{
+    let response=await fetch('https://nocturne-ai.syl-kaminska99.workers.dev/',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        character:c.name,
+        message:text,
+        history:chats[chatId].slice(-20).map(m=>({
+          role:m.who==='user'?'user':'assistant',
+          content:m.text
+        }))
+      })
+    });
+
+    let data=await response.json();
+
+    if(!response.ok)throw new Error(data.error||'Błąd połączenia z AI');
+
+    chats[chatId].push({who:'ai',text:data.reply});
+    save();
+    renderMessages();
+  }catch(error){
+    console.error(error);
+    alert('Nie udało się połączyć z AI. Sprawdź konsolę lub spróbuj ponownie.');
+  }finally{
+    send.disabled=false;
+    input.focus();
+  }
+}document.getElementById('entry').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
 function clearChat(){if(!current)return;if(confirm('Wyczyścić tę rozmowę i zacząć od początku?')){chats[current]=[{who:'ai',text:chars[current].intro}];save();renderMessages()}}
 function resetAll(){if(confirm('Usunąć wszystkie zapisane rozmowy z tego urządzenia?')){chats={};save();alert('Rozmowy usunięte.')}} 
 function exportChats(){let blob=new Blob([JSON.stringify(chats,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nocturne-rozmowy.json';a.click();URL.revokeObjectURL(a.href)}
